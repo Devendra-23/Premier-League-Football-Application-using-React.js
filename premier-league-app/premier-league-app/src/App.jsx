@@ -1,11 +1,20 @@
-import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Predictions from "./pages/Predictions";
 
-function App() {
+export default function App() {
   return (
-    <>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
-    </>
+    <Router>
+      <Navbar />
+      <main className="min-h-screen bg-gray-50 pt-20">
+        {" "}
+        {/* Added padding-top for navbar */}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/predictions" element={<Predictions />} />
+        </Routes>
+      </main>
+    </Router>
   );
 }
-
-export default App;
