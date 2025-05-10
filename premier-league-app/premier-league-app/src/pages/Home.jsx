@@ -6,10 +6,14 @@ export default function Home() {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [leagueLogo, setLeagueLogo] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const leagueResponse = await api.get("/leagues?id=39&season=2024");
+        setLeagueLogo(leagueResponse.data.response[0].league.logo);
+
         // Fetch 2024-2025 season standings
         const standingsResponse = await api.get(
           "/standings?season=2024&league=39"
@@ -59,52 +63,91 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen pt-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto h-full flex flex-col">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          2024/25 Premier League Season
-        </h1>
+    <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen pt-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1800px] mx-auto h-full flex flex-col">
+        <div className="flex items-center justify-center mb-8 space-x-4">
+          {leagueLogo && (
+            <img
+              src={leagueLogo}
+              alt="Premier League Logo"
+              className="w-16 h-16 object-contain"
+              loading="lazy"
+            />
+          )}
+          <h1 className="text-3xl font-bold text-fuchsia-900 bg-clip-text bg-gradient-to-r">
+            2024/25 Premier League Season
+          </h1>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1 pb-8">
-          {/* Current Standings Table */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
-              Current Standings
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 flex-1 pb-8">
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 border-2 border-fuchsia-950/10 relative overflow-hidden ">
+            <h2 className="text-xl font-semibold mb-4 text-fuchsia-950 border-b-2 border-fuchsia-950/30 pb-2 mx-6">
+              League Table
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-gray-600 border-b">
-                    <th className="pb-2 px-2">Pos</th>
-                    <th className="pb-2">Team</th>
-                    <th className="pb-2 px-2">P</th>
-                    <th className="pb-2 px-2">GD</th>
-                    <th className="pb-2 px-2">Pts</th>
+                  <tr className="text-left text-gray-600 bg-gray-50">
+                    <th className="px-4 py-3">Pos</th>
+                    <th className="px-4 py-3">Team</th>
+                    <th className="px-4 py-3 text-center">Played</th>
+                    <th className="px-4 py-3 text-center">GD</th>
+                    <th className="px-4 py-3 text-center">Form</th>
+                    <th className="px-4 py-3 text-center">Points</th>
                   </tr>
                 </thead>
                 <tbody>
                   {standings.map((team) => (
                     <tr
                       key={team.team.id}
-                      className="border-b hover:bg-gray-50"
+                      className="border-b hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <td className="py-3 px-2 text-center">{team.rank}</td>
-                      <td className="py-3 flex items-center">
+                      <td className="px-4 py-3 font-medium text-gray-700">
+                        {team.rank}
+                      </td>
+                      <td className="px-4 py-3 flex items-center">
                         <img
                           src={team.team.logo}
                           alt={team.team.name}
-                          className="w-8 h-8 mr-3"
+                          className="w-10 h-10 mr-3 bg-white p-1 rounded-full shadow-sm"
                           loading="lazy"
                         />
                         <span className="font-medium">{team.team.name}</span>
                       </td>
-                      <td className="py-3 px-2 text-center">
+                      <td className="px-4 py-3 text-center text-gray-600">
                         {team.all.played}
                       </td>
-                      <td className="py-3 px-2 text-center">
-                        {team.goalsDiff}
+                      <td className="px-4 py-3 text-center font-semibold">
+                        <span
+                          className={`px-2 py-1 rounded ${
+                            team.goalsDiff >= 0
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {team.goalsDiff}
+                        </span>
                       </td>
-                      <td className="py-3 px-2 text-center font-bold text-emerald-600">
+                      <td className="px-4 py-3 text-center font-semibold">
+                        <div className="flex justify-center space-x-1">
+                          {team.form?.split("").map((result, index) => (
+                            <span
+                              key={index}
+                              className={`inline-block w-6 h-6 rounded-full text-xs flex items-center justify-center
+                ${
+                  result === "W"
+                    ? "bg-green-100 text-green-800"
+                    : result === "D"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+                            >
+                              {result}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-center font-bold text-emerald-700">
                         {team.points}
                       </td>
                     </tr>
@@ -114,9 +157,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Recent Matches Section */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+          {/* Enhanced Recent Matches Section */}
+          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+            <h2 className="text-xl font-semibold mb-4 text-fuchsia-950 border-b-2 border-fuchsia-950/30 pb-2 mx-6">
               Recent Matches
             </h2>
             <div className="space-y-4">
@@ -128,25 +171,25 @@ export default function Home() {
                 matches.map((match) => (
                   <div
                     key={match.fixture.id}
-                    className="border-b pb-4 last:border-0 hover:bg-gray-50 rounded px-2"
+                    className="group p-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 border-b last:border-0"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center w-1/3">
+                      <div className="flex items-center flex-1">
                         <img
                           src={match.teams.home.logo}
-                          className="w-8 h-8 mr-2"
+                          className="w-10 h-10 mr-2 bg-white p-1 rounded-full shadow-sm"
                           alt={match.teams.home.name}
                           loading="lazy"
                         />
-                        <span className="truncate font-medium">
+                        <span className="font-medium text-gray-800 truncate">
                           {match.teams.home.name}
                         </span>
                       </div>
-                      <div className="text-center w-1/3">
-                        <div className="font-semibold text-lg">
-                          {match.goals.home ?? "-"} - {match.goals.away ?? "-"}
+                      <div className="mx-4 text-center">
+                        <div className="font-bold text-lg bg-gray-100 px-3 py-1 rounded-full">
+                          {match.goals.home ?? "0"} - {match.goals.away ?? "0"}
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <div className="text-sm text-gray-500 mt-1">
                           {new Date(match.fixture.date).toLocaleDateString(
                             "en-GB",
                             {
@@ -155,16 +198,16 @@ export default function Home() {
                               year: "numeric",
                             }
                           )}
-                        </p>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-end w-1/3">
+                      <div className="flex items-center flex-1 justify-end">
                         <img
                           src={match.teams.away.logo}
-                          className="w-8 h-8 mr-2"
+                          className="w-10 h-10 ml-2 bg-white p-1 rounded-full shadow-sm"
                           alt={match.teams.away.name}
                           loading="lazy"
                         />
-                        <span className="truncate font-medium">
+                        <span className="font-medium text-gray-800 truncate">
                           {match.teams.away.name}
                         </span>
                       </div>
