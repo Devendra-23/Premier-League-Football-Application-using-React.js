@@ -63,7 +63,7 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen pt-16 px-4 sm:px-6 lg:px-8">
+    <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 min-h-[calc(100vh-4rem)] pt-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-[1800px] mx-auto h-full flex flex-col">
         <div className="flex items-center justify-center mb-8 space-x-4">
           {leagueLogo && (
@@ -72,6 +72,7 @@ export default function Home() {
               alt="Premier League Logo"
               className="w-16 h-16 object-contain"
               loading="lazy"
+              style={{ transform: "translateZ(0)" }}
             />
           )}
           <h1 className="text-3xl font-bold text-fuchsia-900 bg-clip-text bg-gradient-to-r">
@@ -79,21 +80,21 @@ export default function Home() {
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8 flex-1 pb-8">
-          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300 border-2 border-fuchsia-950/10 relative overflow-hidden ">
-            <h2 className="text-xl font-semibold mb-4 text-fuchsia-950 border-b-2 border-fuchsia-950/30 pb-2 mx-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(800px,2fr)_minmax(300px,1fr)] gap-8 flex-1 pb-8">
+          <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-fuchsia-950/10 chrome-fix">
+            <h2 className="text-xl font-semibold mb-4 text-fuchsia-950 border-b-2 border-fuchsia-950/30 pb-2">
               League Table
             </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto scrollbar-chrome">
+              <table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="text-left text-gray-600 bg-gray-50">
-                    <th className="px-4 py-3">Pos</th>
-                    <th className="px-4 py-3">Team</th>
-                    <th className="px-4 py-3 text-center">Played</th>
-                    <th className="px-4 py-3 text-center">GD</th>
-                    <th className="px-4 py-3 text-center">Form</th>
-                    <th className="px-4 py-3 text-center">Points</th>
+                    <th className="px-4 py-3 w-16">Pos</th>
+                    <th className="px-4 py-3 min-w-[200px]">Team</th>
+                    <th className="px-4 py-3 w-24 text-center">Played</th>
+                    <th className="px-4 py-3 w-24 text-center">GD</th>
+                    <th className="px-4 py-3 w-48 text-center">Form</th>
+                    <th className="px-4 py-3 w-24 text-center">Points</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -105,7 +106,7 @@ export default function Home() {
                       <td className="px-4 py-3 font-medium text-gray-700">
                         {team.rank}
                       </td>
-                      <td className="px-4 py-3 flex items-center">
+                      <td className="px-4 py-3 flex items-center min-w-[250px]">
                         <img
                           src={team.team.logo}
                           alt={team.team.name}
@@ -173,23 +174,26 @@ export default function Home() {
                     key={match.fixture.id}
                     className="group p-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 border-b last:border-0"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center flex-1">
+                    <div className="flex items-center justify-between gap-6 w-full">
+                      {/* Home Team */}
+                      <div className="flex items-center flex-1 min-w-[160px]">
                         <img
                           src={match.teams.home.logo}
-                          className="w-10 h-10 mr-2 bg-white p-1 rounded-full shadow-sm"
+                          className="w-10 h-10 mr-3 bg-white p-1 rounded-full shadow-sm"
                           alt={match.teams.home.name}
                           loading="lazy"
                         />
-                        <span className="font-medium text-gray-800 truncate">
+                        <span className="font-medium text-gray-800 truncate text-base">
                           {match.teams.home.name}
                         </span>
                       </div>
-                      <div className="mx-4 text-center">
-                        <div className="font-bold text-lg bg-gray-100 px-3 py-1 rounded-full">
+
+                      {/* Score & Date */}
+                      <div className="mx-4 text-center min-w-[140px]">
+                        <div className="font-bold text-xl bg-gray-100 px-4 py-2 rounded-full">
                           {match.goals.home ?? "0"} - {match.goals.away ?? "0"}
                         </div>
-                        <div className="text-sm text-gray-500 mt-1">
+                        <div className="text-sm text-gray-500 mt-1.5">
                           {new Date(match.fixture.date).toLocaleDateString(
                             "en-GB",
                             {
@@ -200,16 +204,18 @@ export default function Home() {
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center flex-1 justify-end">
+
+                      {/* Away Team */}
+                      <div className="flex items-center flex-1 min-w-[160px] justify-end">
+                        <span className="font-medium text-gray-800 truncate text-base">
+                          {match.teams.away.name}
+                        </span>
                         <img
                           src={match.teams.away.logo}
-                          className="w-10 h-10 ml-2 bg-white p-1 rounded-full shadow-sm"
+                          className="w-10 h-10 ml-3 bg-white p-1 rounded-full shadow-sm"
                           alt={match.teams.away.name}
                           loading="lazy"
                         />
-                        <span className="font-medium text-gray-800 truncate">
-                          {match.teams.away.name}
-                        </span>
                       </div>
                     </div>
                   </div>

@@ -6,15 +6,15 @@ import Predictions from "./pages/Predictions";
 export default function App() {
   return (
     <Router>
-      <Navbar />
-      <main className="min-h-screen bg-gray-50 pt-20">
-        {" "}
-        {/* Added padding-top for navbar */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/predictions" element={<Predictions />} />
-        </Routes>
-      </main>
+      <div className="font-poppins bg-gray-50 min-h-screen">
+        <Navbar />
+        <main className="pt-16 min-h-[calc(100vh-4rem)] chrome-fix">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/predictions" element={<Predictions />} />
+          </Routes>
+        </main>
+      </div>
     </Router>
   );
 }

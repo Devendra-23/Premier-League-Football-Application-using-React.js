@@ -59,6 +59,25 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+/* Chrome-specific scrollbar */
+.chrome-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.chrome-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.chrome-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.chrome-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -70,5 +89,92 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+/* Mobile-first media queries */
+@media (max-width: 767px) {
+  .league-table-card {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+  }
+
+  .recent-matches-card {
+    margin-top: 1rem;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .league-table-card {
+    margin-left: -2rem;
+    margin-right: -2rem;
+  }
+
+  .team-name {
+    font-size: 0.875rem;
+  }
+}
+
+/* Desktop overrides */
+@media (min-width: 1024px) {
+  .grid-container {
+    grid-template-columns: minmax(800px, 2fr) minmax(300px, 1fr);
+  }
+}
+
+/* Chrome-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .nav-logo {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  body {
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: more) {
+  .nav-link {
+    border: 2px solid white;
+  }
+}
+/* Chrome rendering fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .chrome-fix {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  table {
+    border-collapse: separate; /* Fix border rendering */
+    border-spacing: 0;
+  }
+}
+
+/* Responsive table fixes */
+@media (max-width: 767px) {
+  .league-table-card {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 600px;
+  }
+}
+
+.recent-matches-card {
+  min-width: 400px;
+}
+
+@media (max-width: 1024px) {
+  .recent-matches-card {
+    min-width: 100%;
   }
 }
