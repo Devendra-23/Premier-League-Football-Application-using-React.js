@@ -158,14 +158,13 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Enhanced Recent Matches Section */}
-          <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-            <h2 className="text-xl font-semibold mb-4 text-fuchsia-950 border-b-2 border-fuchsia-950/30 pb-2 mx-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-fuchsia-950/10 chrome-fix h-full">
+            <h2 className="text-xl font-semibold mb-4 text-fuchsia-950 border-b-2 border-fuchsia-950/30 pb-2">
               Recent Matches
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-4 h-[calc(100%-60px)] overflow-y-auto">
               {matches.length === 0 ? (
-                <div className="text-center py-4 text-gray-500">
+                <div className="text-center py-4 text-gray-500 h-full flex items-center justify-center">
                   No matches available yet
                 </div>
               ) : (
@@ -174,26 +173,27 @@ export default function Home() {
                     key={match.fixture.id}
                     className="group p-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 border-b last:border-0"
                   >
-                    <div className="flex items-center justify-between gap-6 w-full">
+                    {/* Changed to grid layout */}
+                    <div className="grid grid-cols-5 items-center gap-4">
                       {/* Home Team */}
-                      <div className="flex items-center flex-1 min-w-[160px]">
+                      <div className="col-span-2 flex items-center">
                         <img
                           src={match.teams.home.logo}
-                          className="w-10 h-10 mr-3 bg-white p-1 rounded-full shadow-sm"
+                          className="w-10 h-10 mr-3 bg-white p-1 rounded-full shadow-sm flex-shrink-0"
                           alt={match.teams.home.name}
                           loading="lazy"
                         />
-                        <span className="font-medium text-gray-800 truncate text-base">
+                        <span className="font-medium text-gray-800 truncate text-sm">
                           {match.teams.home.name}
                         </span>
                       </div>
 
                       {/* Score & Date */}
-                      <div className="mx-4 text-center min-w-[140px]">
-                        <div className="font-bold text-xl bg-gray-100 px-4 py-2 rounded-full">
+                      <div className="col-span-1 text-center">
+                        <div className="font-bold text-lg bg-gray-100 px-2 py-1 rounded-full mx-auto max-w-[120px]">
                           {match.goals.home ?? "0"} - {match.goals.away ?? "0"}
                         </div>
-                        <div className="text-sm text-gray-500 mt-1.5">
+                        <div className="text-xs text-gray-500 mt-1">
                           {new Date(match.fixture.date).toLocaleDateString(
                             "en-GB",
                             {
@@ -206,13 +206,13 @@ export default function Home() {
                       </div>
 
                       {/* Away Team */}
-                      <div className="flex items-center flex-1 min-w-[160px] justify-end">
-                        <span className="font-medium text-gray-800 truncate text-base">
+                      <div className="col-span-2 flex items-center justify-end">
+                        <span className="font-medium text-gray-800 truncate text-sm mr-3">
                           {match.teams.away.name}
                         </span>
                         <img
                           src={match.teams.away.logo}
-                          className="w-10 h-10 ml-3 bg-white p-1 rounded-full shadow-sm"
+                          className="w-10 h-10 bg-white p-1 rounded-full shadow-sm flex-shrink-0"
                           alt={match.teams.away.name}
                           loading="lazy"
                         />
