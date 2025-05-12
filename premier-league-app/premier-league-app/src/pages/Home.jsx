@@ -113,7 +113,9 @@ export default function Home() {
                           className="w-10 h-10 mr-3 bg-white p-1 rounded-full shadow-sm"
                           loading="lazy"
                         />
-                        <span className="font-medium">{team.team.name}</span>
+                        <span className="font-medium text-gray-900">
+                          {team.team.name}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-center text-gray-600">
                         {team.all.played}
@@ -162,7 +164,7 @@ export default function Home() {
             <h2 className="text-xl font-semibold mb-4 text-fuchsia-950 border-b-2 border-fuchsia-950/30 pb-2">
               Recent Matches
             </h2>
-            <div className="space-y-4 h-[calc(100%-60px)] overflow-y-auto">
+            <div className="space-y-4 h-[calc(100%-60px)] overflow-y-auto scroll-container">
               {matches.length === 0 ? (
                 <div className="text-center py-4 text-gray-500 h-full flex items-center justify-center">
                   No matches available yet
@@ -190,7 +192,7 @@ export default function Home() {
 
                       {/* Score & Date */}
                       <div className="col-span-1 text-center">
-                        <div className="font-bold text-lg bg-gray-100 px-2 py-1 rounded-full mx-auto max-w-[120px]">
+                        <div className="font-bold text-lg bg-gray-100 text-gray-900 px-2 py-1 rounded-full mx-auto max-w-[120px]">
                           {match.goals.home ?? "0"} - {match.goals.away ?? "0"}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">

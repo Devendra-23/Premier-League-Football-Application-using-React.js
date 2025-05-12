@@ -6,7 +6,7 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  /* color: rgba(255, 255, 255, 0.87); */
   background-color: #242424;
 
   font-synthesis: none;
@@ -59,6 +59,7 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
 /* Chrome-specific scrollbar */
 .chrome-scrollbar::-webkit-scrollbar {
   width: 8px;
@@ -78,10 +79,29 @@ button:focus-visible {
 .chrome-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+.match-item {
+  min-height: 80px;
+}
 
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 3px;
+}
+
+body {
+  color: #1a1a1a; /* Default text color for light mode */
+}
+
+.league-table-card table td {
+  color: #1a1a1a !important; /* Dark color for readability */
+}
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
+    /* color: #213547; */
     background-color: #ffffff;
   }
   a:hover {
@@ -176,5 +196,11 @@ button:focus-visible {
 @media (max-width: 1024px) {
   .recent-matches-card {
     min-width: 100%;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: white; /* Default text color for dark mode */
   }
 }
