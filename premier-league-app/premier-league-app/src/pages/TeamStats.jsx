@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
+import { Listbox } from "@headlessui/react";
 
 export default function TeamStats() {
   const [teams, setTeams] = useState([]);
@@ -65,21 +66,64 @@ export default function TeamStats() {
   return (
     <div className="space-y-8">
       <div className="mb-4">
-        <label className="block mb-2 font-medium text-fuchsia-900">
+        <label className="block mb-2 font-semibold text-fuchsia-900 text-lg">
           Select a Premier League Team:
         </label>
-        <select
-          className="w-full p-2 border rounded-lg"
-          value={selectedTeam}
-          onChange={(e) => setSelectedTeam(e.target.value)}
-        >
-          <option value="">-- Choose a team --</option>
-          {teams.map((teamObj) => (
-            <option key={teamObj.team.id} value={teamObj.team.id}>
-              {teamObj.team.name}
-            </option>
-          ))}
-        </select>
+        <Listbox value={selectedTeam} onChange={setSelectedTeam}>
+          {({ open }) => (
+            <div className="relative z-40">
+              <Listbox.Button className="w-full bg-fuchsia-50 dark:bg-fuchsia-50 !bg-fuchsia-50 border border-fuchsia-200 dark:border-fuchsia-200 text-fuchsia-900 dark:text-fuchsia-900 font-medium rounded-lg px-4 py-2 pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-fuchsia-500 flex justify-between items-cente">
+                <span>
+                  {selectedTeam
+                    ? teams.find((t) => t.team.id == selectedTeam)?.team.name
+                    : "-- Choose a team --"}
+                </span>
+                <svg
+                  className="w-5 h-5 text-fuchsia-600 ml-2"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </Listbox.Button>
+
+              {open && (
+                <Listbox.Options className="absolute mt-2 w-full bg-white border border-fuchsia-200 rounded-lg shadow-lg max-h-60 overflow-auto z-50">
+                  {teams.map((teamObj) => (
+                    <Listbox.Option
+                      key={teamObj.team.id}
+                      value={teamObj.team.id}
+                      className={({ active, selected }) =>
+                        `cursor-pointer select-none px-4 py-2 ${
+                          active
+                            ? "bg-fuchsia-100 text-fuchsia-900"
+                            : selected
+                            ? "bg-fuchsia-200 text-fuchsia-900 font-semibold"
+                            : "text-gray-800"
+                        }`
+                      }
+                    >
+                      <div className="flex items-center">
+                        <img
+                          src={teamObj.team.logo}
+                          alt={teamObj.team.name}
+                          className="w-5 h-5 mr-2 rounded-full"
+                        />
+                        {teamObj.team.name}
+                      </div>
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              )}
+            </div>
+          )}
+        </Listbox>
       </div>
 
       {loading && <LoadingSpinner />}
