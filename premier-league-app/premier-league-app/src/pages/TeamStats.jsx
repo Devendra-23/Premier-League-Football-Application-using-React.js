@@ -2,35 +2,57 @@ import { useEffect, useState } from "react";
 import { api } from "../services/api";
 
 export default function TeamStats() {
+  const [teams, setTeams] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState("");
   const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Fetch Premier League teams
   useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const response = await api.get("/teams", {
+          params: {
+            league: 39,
+            season: 2024,
+          },
+        });
+        setTeams(response.data.response);
+      } catch (err) {
+        console.error("Team fetch error:", err);
+        setError("Failed to fetch teams.");
+      }
+    };
+    fetchTeams();
+  }, []);
+
+  // Fetch stats when a team is selected
+  useEffect(() => {
+    if (!selectedTeam) return;
+
     const fetchStats = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await api.get("/teams/statistics", {
           params: {
             league: 39,
             season: 2024,
-            team: 33, // Replace with dynamic team ID if needed
+            team: selectedTeam,
           },
         });
-        console.log("API response:", response.data);
         setStats(response.data.response);
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("Stats fetch error:", err);
         setError("Failed to fetch team statistics.");
       } finally {
         setLoading(false);
       }
     };
-    fetchStats();
-  }, []);
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return <p className="text-red-600">{error}</p>;
-  if (!stats) return <p className="text-gray-500">No stats available.</p>;
+    fetchStats();
+  }, [selectedTeam]);
 
   const getSafe = (path, fallback = "N/A") => {
     try {
@@ -42,89 +64,163 @@ export default function TeamStats() {
 
   return (
     <div className="space-y-8">
-      {/* Overall Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
-          title="Matches Played"
-          value={getSafe(() => stats.fixtures.played.total)}
-        />
-        <StatCard
-          title="Goals Scored"
-          value={getSafe(() => stats.goals.for.total.total)}
-        />
-        <StatCard
-          title="Goals Conceded"
-          value={getSafe(() => stats.goals.against.total.total)}
-        />
-        <StatCard
-          title="Clean Sheets"
-          value={getSafe(() => stats.clean_sheet.total)}
-        />
+      <div className="mb-4">
+        <label className="block mb-2 font-medium text-fuchsia-900">
+          Select a Premier League Team:
+        </label>
+        <select
+          className="w-full p-2 border rounded-lg"
+          value={selectedTeam}
+          onChange={(e) => setSelectedTeam(e.target.value)}
+        >
+          <option value="">-- Choose a team --</option>
+          {teams.map((teamObj) => (
+            <option key={teamObj.team.id} value={teamObj.team.id}>
+              {teamObj.team.name}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Home/Away Split */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
-            Home Performance
-          </h3>
-          <div className="space-y-2">
-            <StatRow
-              title="Wins"
-              value={getSafe(() => stats.fixtures.wins.home)}
+      {loading && <LoadingSpinner />}
+      {error && <p className="text-red-600">{error}</p>}
+      {!loading && !stats && selectedTeam && (
+        <p className="text-gray-500">No stats available.</p>
+      )}
+
+      {stats && (
+        <>
+          {/* Overall Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard
+              title="Matches Played"
+              value={getSafe(() => stats.fixtures.played.total)}
             />
-            <StatRow
-              title="Goals"
-              value={getSafe(() => stats.goals.for.total.home)}
+            <StatCard
+              title="Goals Scored"
+              value={getSafe(() => stats.goals.for.total.total)}
             />
-            <StatRow
+            <StatCard
+              title="Goals Conceded"
+              value={getSafe(() => stats.goals.against.total.total)}
+            />
+            <StatCard
               title="Clean Sheets"
-              value={getSafe(() => stats.clean_sheet.home)}
+              value={getSafe(() => stats.clean_sheet.total)}
             />
           </div>
-        </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
-            Away Performance
-          </h3>
-          <div className="space-y-2">
-            <StatRow
-              title="Wins"
-              value={getSafe(() => stats.fixtures.wins.away)}
-            />
-            <StatRow
-              title="Goals"
-              value={getSafe(() => stats.goals.for.total.away)}
-            />
-            <StatRow
-              title="Clean Sheets"
-              value={getSafe(() => stats.clean_sheet.away)}
-            />
+          {/* Home/Away Split */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+                Home Performance
+              </h3>
+              <div className="space-y-2">
+                <StatRow
+                  title="Wins"
+                  value={getSafe(() => stats.fixtures.wins.home)}
+                />
+                <StatRow
+                  title="Goals"
+                  value={getSafe(() => stats.goals.for.total.home)}
+                />
+                <StatRow
+                  title="Clean Sheets"
+                  value={getSafe(() => stats.clean_sheet.home)}
+                />
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow">
+              <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+                Away Performance
+              </h3>
+              <div className="space-y-2">
+                <StatRow
+                  title="Wins"
+                  value={getSafe(() => stats.fixtures.wins.away)}
+                />
+                <StatRow
+                  title="Goals"
+                  value={getSafe(() => stats.goals.for.total.away)}
+                />
+                <StatRow
+                  title="Clean Sheets"
+                  value={getSafe(() => stats.clean_sheet.away)}
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Advanced Stats */}
-      <div className="bg-white p-6 rounded-xl shadow">
-        <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
-          Match Analytics
-        </h3>
-        <div className="grid grid-cols-3 gap-4">
-          <StatCard
-            title="Possession Avg"
-            value={`${getSafe(() => stats.avg_percent.possession)}%`}
-          />
-          <StatCard
-            title="Shots on Target"
-            value={getSafe(() => stats.shots.on.total)}
-          />
-          <StatCard
-            title="Pass Accuracy"
-            value={`${getSafe(() => stats.passes.accuracy)}%`}
-          />
-        </div>
-      </div>
+          {/* Advanced Stats */}
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+              Match Analytics
+            </h3>
+            <div className="grid grid-cols-3 gap-4">
+              <StatCard
+                title="Possession Avg"
+                value={`${getSafe(() => stats.avg_percent.possession)}%`}
+              />
+              <StatCard
+                title="Shots on Target"
+                value={getSafe(() => stats.shots.on.total)}
+              />
+              <StatCard
+                title="Pass Accuracy"
+                value={`${getSafe(() => stats.passes.accuracy)}%`}
+              />
+            </div>
+          </div>
+
+          {/* Shooting Stats */}
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+              Shooting Summary
+            </h3>
+            <div className="grid grid-cols-3 gap-4">
+              <StatCard
+                title="Total Shots"
+                value={getSafe(() => stats.shots.total.total)}
+              />
+              <StatCard
+                title="Shots on Target"
+                value={getSafe(() => stats.shots.on.total)}
+              />
+              <StatCard
+                title="Shots off Target"
+                value={getSafe(() => stats.shots.off.total)}
+              />
+            </div>
+          </div>
+
+          {/* Discipline & Penalties */}
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+              Discipline & Penalties
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <StatCard
+                title="Yellow Cards"
+                value={getSafe(() => stats.cards.yellow.total)}
+              />
+              <StatCard
+                title="Red Cards"
+                value={getSafe(() => stats.cards.red.total)}
+              />
+              <StatCard
+                title="Penalties Scored"
+                value={getSafe(() => stats.penalty.scored.total)}
+              />
+              <StatCard
+                title="Penalties Missed"
+                value={getSafe(() => stats.penalty.missed.total)}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -144,7 +240,7 @@ const StatRow = ({ title, value }) => (
   </div>
 );
 
-// Simple loading spinner
+// Loading Spinner
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-32">
     <div className="w-8 h-8 border-4 border-gray-300 border-t-fuchsia-500 rounded-full animate-spin"></div>
