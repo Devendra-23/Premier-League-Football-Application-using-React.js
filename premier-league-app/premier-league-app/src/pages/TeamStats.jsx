@@ -73,11 +73,22 @@ export default function TeamStats() {
           {({ open }) => (
             <div className="relative z-40">
               <Listbox.Button className="w-full bg-fuchsia-50 dark:bg-fuchsia-50 !bg-fuchsia-50 border border-fuchsia-200 dark:border-fuchsia-200 text-fuchsia-900 dark:text-fuchsia-900 font-medium rounded-lg px-4 py-2 pr-10 shadow-sm focus:outline-none focus:ring-2 focus:ring-fuchsia-500 flex justify-between items-cente">
-                <span>
-                  {selectedTeam
-                    ? teams.find((t) => t.team.id == selectedTeam)?.team.name
-                    : "-- Choose a team --"}
-                </span>
+                <div className="flex items-center gap-2">
+                  {selectedTeam && (
+                    <img
+                      src={
+                        teams.find((t) => t.team.id == selectedTeam)?.team.logo
+                      }
+                      alt="Team logo"
+                      className="w-5 h-5 rounded-full"
+                    />
+                  )}
+                  <span>
+                    {selectedTeam
+                      ? teams.find((t) => t.team.id == selectedTeam)?.team.name
+                      : "-- Choose a team --"}
+                  </span>
+                </div>
                 <svg
                   className="w-5 h-5 text-fuchsia-600 ml-2"
                   fill="none"
