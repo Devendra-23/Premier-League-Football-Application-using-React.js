@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Predictions from "./pages/Predictions";
+import StatsPage from "./pages/StatsPage";
+import TeamStats from "./pages/TeamStats";
+import PlayerStats from "./pages/PlayerStats";
 
 export default function App() {
   return (
@@ -12,6 +15,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/predictions" element={<Predictions />} />
+            <Route path="/stats" element={<StatsPage />}>
+              <Route path="team" element={<TeamStats />} />
+              <Route path="players" element={<PlayerStats />} />
+            </Route>
           </Routes>
         </main>
       </div>

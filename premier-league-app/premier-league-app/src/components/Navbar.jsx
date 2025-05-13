@@ -38,6 +38,12 @@ export default function Navbar() {
             >
               Predictions
             </Link>
+            <Link
+              to="/stats"
+              className="text-2xl font-bold text-white hover:text-indigo-300 transition-colors duration-200"
+            >
+              Stats
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}

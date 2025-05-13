@@ -1,0 +1,152 @@
+import { useEffect, useState } from "react";
+import { api } from "../services/api";
+
+export default function TeamStats() {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await api.get("/teams/statistics", {
+          params: {
+            league: 39,
+            season: 2024,
+            team: 33, // Replace with dynamic team ID if needed
+          },
+        });
+        console.log("API response:", response.data);
+        setStats(response.data.response);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError("Failed to fetch team statistics.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <p className="text-red-600">{error}</p>;
+  if (!stats) return <p className="text-gray-500">No stats available.</p>;
+
+  const getSafe = (path, fallback = "N/A") => {
+    try {
+      return path();
+    } catch {
+      return fallback;
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Overall Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard
+          title="Matches Played"
+          value={getSafe(() => stats.fixtures.played.total)}
+        />
+        <StatCard
+          title="Goals Scored"
+          value={getSafe(() => stats.goals.for.total.total)}
+        />
+        <StatCard
+          title="Goals Conceded"
+          value={getSafe(() => stats.goals.against.total.total)}
+        />
+        <StatCard
+          title="Clean Sheets"
+          value={getSafe(() => stats.clean_sheet.total)}
+        />
+      </div>
+
+      {/* Home/Away Split */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-white p-6 rounded-xl shadow">
+          <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+            Home Performance
+          </h3>
+          <div className="space-y-2">
+            <StatRow
+              title="Wins"
+              value={getSafe(() => stats.fixtures.wins.home)}
+            />
+            <StatRow
+              title="Goals"
+              value={getSafe(() => stats.goals.for.total.home)}
+            />
+            <StatRow
+              title="Clean Sheets"
+              value={getSafe(() => stats.clean_sheet.home)}
+            />
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow">
+          <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+            Away Performance
+          </h3>
+          <div className="space-y-2">
+            <StatRow
+              title="Wins"
+              value={getSafe(() => stats.fixtures.wins.away)}
+            />
+            <StatRow
+              title="Goals"
+              value={getSafe(() => stats.goals.for.total.away)}
+            />
+            <StatRow
+              title="Clean Sheets"
+              value={getSafe(() => stats.clean_sheet.away)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Advanced Stats */}
+      <div className="bg-white p-6 rounded-xl shadow">
+        <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+          Match Analytics
+        </h3>
+        <div className="grid grid-cols-3 gap-4">
+          <StatCard
+            title="Possession Avg"
+            value={`${getSafe(() => stats.avg_percent.possession)}%`}
+          />
+          <StatCard
+            title="Shots on Target"
+            value={getSafe(() => stats.shots.on.total)}
+          />
+          <StatCard
+            title="Pass Accuracy"
+            value={`${getSafe(() => stats.passes.accuracy)}%`}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Reusable components
+const StatCard = ({ title, value }) => (
+  <div className="bg-gray-50 p-4 rounded-lg text-center">
+    <h4 className="text-sm text-gray-600 mb-1">{title}</h4>
+    <p className="text-2xl font-bold text-fuchsia-900">{value}</p>
+  </div>
+);
+
+const StatRow = ({ title, value }) => (
+  <div className="flex justify-between items-center py-2 border-b">
+    <span className="text-gray-600">{title}</span>
+    <span className="font-medium text-fuchsia-900">{value}</span>
+  </div>
+);
+
+// Simple loading spinner
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center h-32">
+    <div className="w-8 h-8 border-4 border-gray-300 border-t-fuchsia-500 rounded-full animate-spin"></div>
+  </div>
+);
