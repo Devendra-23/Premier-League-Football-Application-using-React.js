@@ -1,4 +1,3 @@
-// PlayerStats.jsx
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
 
@@ -9,8 +8,10 @@ export default function PlayerStats() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchTopStats = async () => {
       try {
+        setLoading(true);
+
         const [scorersRes, assistsRes] = await Promise.all([
           api.get("/players/topscorers", {
             params: { league: 39, season: 2024 },
@@ -22,13 +23,18 @@ export default function PlayerStats() {
 
         setTopScorers(scorersRes.data.response);
         setTopAssists(assistsRes.data.response);
+
+        console.log("Top Scorers Sample:", scorersRes.data.response[0]);
+        console.log("Top Assisters Sample:", assistsRes.data.response[0]);
       } catch (err) {
+        console.error("Fetch error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+
+    fetchTopStats();
   }, []);
 
   if (loading) return <LoadingSpinner />;
@@ -40,13 +46,14 @@ export default function PlayerStats() {
       <div className="bg-white p-6 rounded-xl shadow">
         <h3 className="text-lg font-bold mb-4 text-fuchsia-900">Top Scorers</h3>
         <div className="space-y-3">
-          {topScorers.slice(0, 10).map((player, idx) => (
+          {topScorers.map((playerObj, idx) => (
             <PlayerRow
-              key={player.player.id}
+              key={playerObj.player.id}
               rank={idx + 1}
-              player={player.player}
-              stats={player.statistics[0]}
-              type="goals"
+              player={playerObj.player}
+              team={playerObj.statistics[0].team}
+              value={playerObj.statistics[0].goals.total}
+              label="goals"
             />
           ))}
         </div>
@@ -56,13 +63,14 @@ export default function PlayerStats() {
       <div className="bg-white p-6 rounded-xl shadow">
         <h3 className="text-lg font-bold mb-4 text-fuchsia-900">Top Assists</h3>
         <div className="space-y-3">
-          {topAssists.slice(0, 10).map((player, idx) => (
+          {topAssists.map((playerObj, idx) => (
             <PlayerRow
-              key={player.player.id}
+              key={playerObj.player.id}
               rank={idx + 1}
-              player={player.player}
-              stats={player.statistics[0]}
-              type="assists"
+              player={playerObj.player}
+              team={playerObj.statistics[0].team}
+              value={playerObj.statistics[0].goals.assists}
+              label="assists"
             />
           ))}
         </div>
@@ -71,7 +79,7 @@ export default function PlayerStats() {
   );
 }
 
-const PlayerRow = ({ rank, player, stats, type }) => (
+const PlayerRow = ({ rank, player, team, value, label }) => (
   <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
     <div className="flex items-center gap-3">
       <span className="text-gray-500 w-6">{rank}.</span>
@@ -83,24 +91,19 @@ const PlayerRow = ({ rank, player, stats, type }) => (
       <div>
         <p className="font-medium text-fuchsia-900">{player.name}</p>
         <p className="text-sm text-gray-600 flex items-center gap-1">
-          <img
-            src={stats.team.logo}
-            className="w-4 h-4"
-            alt={stats.team.name}
-          />
-          {stats.team.name}
+          <img src={team.logo} className="w-4 h-4" alt={team.name} />
+          {team.name}
         </p>
       </div>
     </div>
     <span className="font-bold text-emerald-600">
-      {type === "goals" ? stats.goals.total : stats.goals.assists}
+      {value !== null ? value : 0}
     </span>
   </div>
 );
 
-// Simple loading spinner
 const LoadingSpinner = () => (
-  <div className="flex justify-center items-center">
+  <div className="flex justify-center items-center h-32">
     <div className="w-8 h-8 border-4 border-t-4 border-gray-300 border-t-fuchsia-500 rounded-full animate-spin"></div>
   </div>
 );
