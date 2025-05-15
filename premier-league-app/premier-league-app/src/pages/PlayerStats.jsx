@@ -23,9 +23,6 @@ export default function PlayerStats() {
 
         setTopScorers(scorersRes.data.response);
         setTopAssists(assistsRes.data.response);
-
-        console.log("Top Scorers Sample:", scorersRes.data.response[0]);
-        console.log("Top Assisters Sample:", assistsRes.data.response[0]);
       } catch (err) {
         console.error("Fetch error:", err);
         setError(err.message);
@@ -58,7 +55,6 @@ export default function PlayerStats() {
           ))}
         </div>
       </div>
-
       {/* Top Assists */}
       <div className="bg-white p-6 rounded-xl shadow">
         <h3 className="text-lg font-bold mb-4 text-fuchsia-900">Top Assists</h3>
@@ -79,6 +75,7 @@ export default function PlayerStats() {
   );
 }
 
+// Updated PlayerRow component
 const PlayerRow = ({ rank, player, team, value, label }) => (
   <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
     <div className="flex items-center gap-3">
@@ -102,6 +99,7 @@ const PlayerRow = ({ rank, player, team, value, label }) => (
   </div>
 );
 
+// Loading spinner remains same
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-32">
     <div className="w-8 h-8 border-4 border-t-4 border-gray-300 border-t-fuchsia-500 rounded-full animate-spin"></div>

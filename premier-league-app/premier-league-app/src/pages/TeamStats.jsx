@@ -9,6 +9,13 @@ export default function TeamStats() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Add this useEffect here
+  useEffect(() => {
+    if (stats) {
+      console.log("Full stats object:", JSON.parse(JSON.stringify(stats)));
+    }
+  }, [stats]);
+
   // Fetch Premier League teams
   useEffect(() => {
     const fetchTeams = async () => {
@@ -208,62 +215,76 @@ export default function TeamStats() {
             </div>
           </div>
 
-          {/* Advanced Stats */}
           <div className="bg-white p-6 rounded-xl shadow">
             <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
-              Match Analytics
+              Most Used Formations
             </h3>
-            <div className="grid grid-cols-3 gap-4">
-              <StatCard
-                title="Possession Avg"
-                value={`${getSafe(() => stats.avg_percent.possession)}%`}
-              />
-              <StatCard
-                title="Shots on Target"
-                value={getSafe(() => stats.shots.on.total)}
-              />
-              <StatCard
-                title="Pass Accuracy"
-                value={`${getSafe(() => stats.passes.accuracy)}%`}
-              />
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {stats.lineups
+                ?.sort((a, b) => b.played - a.played)
+                .slice(0, 3)
+                .map((formation, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-gray-50 p-4 rounded-lg text-center"
+                  >
+                    <div className="text-xl font-bold text-fuchsia-900">
+                      {getSafe(() => formation.formation)}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Used {getSafe(() => formation.played)} times
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
 
-          {/* Shooting Stats */}
           <div className="bg-white p-6 rounded-xl shadow">
             <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
-              Shooting Summary
-            </h3>
-            <div className="grid grid-cols-3 gap-4">
-              <StatCard
-                title="Total Shots"
-                value={getSafe(() => stats.shots.total.total)}
-              />
-              <StatCard
-                title="Shots on Target"
-                value={getSafe(() => stats.shots.on.total)}
-              />
-              <StatCard
-                title="Shots off Target"
-                value={getSafe(() => stats.shots.off.total)}
-              />
-            </div>
-          </div>
-
-          {/* Discipline & Penalties */}
-          <div className="bg-white p-6 rounded-xl shadow">
-            <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
-              Discipline & Penalties
+              Goals by Minute Interval
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard
-                title="Yellow Cards"
-                value={getSafe(() => stats.cards.yellow.total)}
+                title="0-15' Goals"
+                value={getSafe(() => stats.goals.for.minute["0-15"].total)}
               />
               <StatCard
-                title="Red Cards"
-                value={getSafe(() => stats.cards.red.total)}
+                title="16-30' Goals"
+                value={getSafe(() => stats.goals.for.minute["16-30"].total)}
               />
+              <StatCard
+                title="31-45' Goals"
+                value={getSafe(() => stats.goals.for.minute["31-45"].total)}
+              />
+              <StatCard
+                title="46-60' Goals"
+                value={getSafe(() => stats.goals.for.minute["46-60"].total)}
+              />
+              <StatCard
+                title="61-75' Goals"
+                value={getSafe(() => stats.goals.for.minute["46-60"].total)}
+              />
+              <StatCard
+                title="76-90' Goals"
+                value={getSafe(() => stats.goals.for.minute["46-60"].total)}
+              />
+              <StatCard
+                title="91-105' Goals"
+                value={getSafe(() => stats.goals.for.minute["46-60"].total)}
+              />
+              <StatCard
+                title="106-110' Goals"
+                value={getSafe(() => stats.goals.for.minute["46-60"].total)}
+              />
+            </div>
+          </div>
+
+          {/* Penalties */}
+          <div className="bg-white p-6 rounded-xl shadow">
+            <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+              Penalties
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard
                 title="Penalties Scored"
                 value={getSafe(() => stats.penalty.scored.total)}
