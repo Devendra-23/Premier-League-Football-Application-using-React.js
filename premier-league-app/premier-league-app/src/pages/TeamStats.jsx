@@ -1,7 +1,26 @@
 import { useEffect, useState } from "react";
 import { api } from "../services/api";
 import { Listbox } from "@headlessui/react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
+const PREMIER_LEAGUE_COLORS = {
+  primary: "#00ff85",
+  secondary: "#38003c",
+  accent1: "#04f5ff",
+  accent2: "#e90052",
+};
 export default function TeamStats() {
   const [teams, setTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState("");
@@ -70,6 +89,333 @@ export default function TeamStats() {
     }
   };
 
+  const CombinedPerformanceChart = () => {
+    if (!stats) return null;
+
+    // Prepare data for combined chart
+    const performanceData = [
+      {
+        category: "Wins",
+        home: getSafe(() => stats.fixtures.wins.home, 0),
+        away: getSafe(() => stats.fixtures.wins.away, 0),
+      },
+      {
+        category: "Draws",
+        home: getSafe(() => stats.fixtures.draws.home, 0),
+        away: getSafe(() => stats.fixtures.draws.away, 0),
+      },
+      {
+        category: "Losses",
+        home: getSafe(() => stats.fixtures.loses.home, 0),
+        away: getSafe(() => stats.fixtures.loses.away, 0),
+      },
+      {
+        category: "Goals Scored",
+        home: getSafe(() => stats.goals.for.total.home, 0),
+        away: getSafe(() => stats.goals.for.total.away, 0),
+      },
+      {
+        category: "Clean Sheets",
+        home: getSafe(() => stats.clean_sheet.home, 0),
+        away: getSafe(() => stats.clean_sheet.away, 0),
+      },
+    ];
+
+    return (
+      <div className="bg-white p-6 rounded-xl shadow">
+        <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+          Combined Performance Analysis
+        </h3>
+        <div className="h-96">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={performanceData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="category"
+                angle={0}
+                textAnchor="end"
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis
+                label={{
+                  value: "Number of Matches",
+                  angle: -90,
+                  position: "insideLeft",
+                  style: {
+                    textAnchor: "middle",
+                    fill: PREMIER_LEAGUE_COLORS.secondary,
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  },
+                }}
+                tick={{ fill: PREMIER_LEAGUE_COLORS.secondary }}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  border: "1px solid #f0f0f0",
+                  borderRadius: "4px",
+                }}
+              />
+              <Legend
+                wrapperStyle={{ paddingTop: 20 }}
+                formatter={(value) =>
+                  value.charAt(0).toUpperCase() + value.slice(1)
+                }
+              />
+              <Bar
+                dataKey="home"
+                name="Home Games"
+                fill={PREMIER_LEAGUE_COLORS.primary}
+                radius={[4, 4, 0, 0]}
+              />
+              <Bar
+                dataKey="away"
+                name="Away Games"
+                fill={PREMIER_LEAGUE_COLORS.secondary}
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Additional Key Metrics */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+          <StatCard
+            title="Total Wins"
+            value={getSafe(
+              () => stats.fixtures.wins.home + stats.fixtures.wins.away
+            )}
+          />
+          <StatCard
+            title="Total Draws"
+            value={getSafe(
+              () => stats.fixtures.draws.home + stats.fixtures.draws.away
+            )}
+          />
+          <StatCard
+            title="Total Losses"
+            value={getSafe(
+              () => stats.fixtures.loses.home + stats.fixtures.loses.away
+            )}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const GoalsByMinuteChart = () => {
+    if (!stats?.goals?.for?.minute) return null;
+
+    const minuteData = Object.entries(stats.goals.for.minute).map(
+      ([interval, data]) => ({
+        interval,
+        goals: data.total || 0,
+      })
+    );
+
+    return (
+      <div className="bg-white p-6 rounded-xl shadow">
+        <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
+          Goals by Minute Interval
+        </h3>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={minuteData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="interval"
+                label={{
+                  value: "Minute Intervals",
+                  position: "bottom",
+                  offset: -7,
+                  style: {
+                    textAnchor: "middle",
+                    fill: PREMIER_LEAGUE_COLORS.secondary,
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  },
+                }}
+                tick={{
+                  fill: PREMIER_LEAGUE_COLORS.secondary,
+                  angle: 0, // Ensure ticks are horizontal
+                }}
+              />
+              <YAxis
+                label={{
+                  value: "Goals",
+                  angle: -90,
+                  position: "insideLeft",
+                  style: {
+                    textAnchor: "middle",
+                    fill: PREMIER_LEAGUE_COLORS.secondary,
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  },
+                }}
+                tick={{ fill: PREMIER_LEAGUE_COLORS.secondary }}
+              />
+              <Tooltip />
+              <Bar
+                dataKey="goals"
+                fill={PREMIER_LEAGUE_COLORS.accent2}
+                name="Goals Scored"
+              />
+              <Legend />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    );
+  };
+
+  const FormationUsageChart = () => {
+    if (!stats?.lineups) return null;
+
+    const formationData = stats.lineups
+      .sort((a, b) => b.played - a.played)
+      .slice(0, 5)
+      .map((lineup) => ({
+        formation: lineup.formation,
+        matches: lineup.played || 0,
+      }));
+
+    return (
+      <div className="bg-white p-6 rounded-xl shadow">
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={formationData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="formation" />
+              <YAxis
+                label={{
+                  value: "Number of Matches",
+                  angle: -90,
+                  position: "insideLeft",
+                  style: {
+                    textAnchor: "middle",
+                    fill: PREMIER_LEAGUE_COLORS.secondary,
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  },
+                }}
+                tick={{ fill: PREMIER_LEAGUE_COLORS.secondary }}
+              />
+              <Tooltip />
+              <Bar
+                dataKey="matches"
+                fill={PREMIER_LEAGUE_COLORS.accent1}
+                name="Formation Used for number of matches"
+              />
+              <Legend />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    );
+  };
+
+  const PenaltyStatsChart = () => {
+    if (!stats?.penalty) return null;
+
+    const scored = getSafe(() => stats.penalty.scored.total, 0);
+    const missed = getSafe(() => stats.penalty.missed.total, 0);
+    const total = scored + missed;
+    const conversionRate = total > 0 ? ((scored / total) * 100).toFixed(1) : 0;
+    const missedRate = total > 0 ? ((missed / total) * 100).toFixed(1) : 0;
+
+    return (
+      <div className="bg-white  p-6 rounded-xl shadow">
+        <h3 className="text-lg font-bold mb-4 text-fuchsia-900 ">
+          Penalties Conversion
+          <span className="block text-sm font-normal mt-1 text-fuchsia-900 ">
+            ({conversionRate}% Success Rate)
+          </span>
+        </h3>
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={[
+                  { name: "Scored", value: scored },
+                  { name: "Missed", value: missed },
+                ]}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={80}
+              >
+                <Cell fill={PREMIER_LEAGUE_COLORS.primary} />
+                <Cell fill={PREMIER_LEAGUE_COLORS.accent2} />
+              </Pie>
+
+              <text
+                x="50%"
+                y="50%"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="text-fuchsia-900"
+                style={{
+                  fontSize: "24px",
+                  fontWeight: "bold",
+                }}
+              >
+                {conversionRate}%
+              </text>
+
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-white p-3 rounded-lg shadow-lg border border-fuchsia-900">
+                        <p
+                          className="font-bold"
+                          style={{
+                            color:
+                              payload[0].payload.name === "Scored"
+                                ? PREMIER_LEAGUE_COLORS.primary
+                                : PREMIER_LEAGUE_COLORS.accent2,
+                          }}
+                        >
+                          {payload[0].name}
+                        </p>
+                        <p className="text-fuchsia-900">
+                          Count: {payload[0].value}
+                        </p>
+                        <p className="text-fuchsia-900">
+                          Percentage:{" "}
+                          {payload[0].payload.name === "Scored"
+                            ? conversionRate
+                            : missedRate}
+                          %
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+
+              <Legend
+                formatter={(value) => (
+                  <span className="text-fuchsia-900">
+                    {value} ({value === "Scored" ? conversionRate : missedRate}
+                    %)
+                  </span>
+                )}
+                wrapperStyle={{ paddingTop: 20 }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    );
+  };
   return (
     <div className="space-y-8">
       <div className="mb-4">
@@ -171,8 +517,8 @@ export default function TeamStats() {
               value={getSafe(() => stats.clean_sheet.total)}
             />
           </div>
+          <CombinedPerformanceChart />
 
-          {/* Home/Away Split */}
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white p-6 rounded-xl shadow">
               <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
@@ -193,7 +539,6 @@ export default function TeamStats() {
                 />
               </div>
             </div>
-
             <div className="bg-white p-6 rounded-xl shadow">
               <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
                 Away Performance
@@ -237,9 +582,10 @@ export default function TeamStats() {
                   </div>
                 ))}
             </div>
+            <FormationUsageChart />
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow">
+          {/* <div className="bg-white p-6 rounded-xl shadow">
             <h3 className="text-lg font-bold mb-4 text-fuchsia-900">
               Goals by Minute Interval
             </h3>
@@ -277,7 +623,8 @@ export default function TeamStats() {
                 value={getSafe(() => stats.goals.for.minute["46-60"].total)}
               />
             </div>
-          </div>
+          </div> */}
+          <GoalsByMinuteChart />
 
           {/* Penalties */}
           <div className="bg-white p-6 rounded-xl shadow">
@@ -285,6 +632,14 @@ export default function TeamStats() {
               Penalties
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <PenaltyStatsChart />
+
+              <StatCard
+                title="Penalties Rewarded"
+                value={getSafe(
+                  () => stats.penalty.missed.total + stats.penalty.scored.total
+                )}
+              />
               <StatCard
                 title="Penalties Scored"
                 value={getSafe(() => stats.penalty.scored.total)}
