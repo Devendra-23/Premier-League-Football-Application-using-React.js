@@ -163,10 +163,10 @@ export default function PlayerStats() {
             return (
               <div
                 key={playerObj.player.id}
-                className="bg-white p-4 rounded-lg shadow grid grid-cols-1 md:grid-cols-3 gap-4 items-center"
+                className="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row items-center gap-4"
               >
                 {/* Player Info */}
-                <div className="flex items-center gap-4 col-span-2">
+                <div className="flex items-center gap-4 w-full md:w-2/3">
                   <img
                     src={playerObj.player.photo}
                     alt={playerObj.player.name}
@@ -176,7 +176,7 @@ export default function PlayerStats() {
                     <h4 className="text-sm font-semibold text-fuchsia-900">
                       {playerObj.player.name}
                     </h4>
-                    <p className="text-xs text-gray-600 flex items-center gap-1 mb-2">
+                    <p className="text-xs font-semibold text-fuchsia-900 flex items-center gap-1 mb-2">
                       <img
                         src={playerObj.statistics[0].team.logo}
                         className="w-4 h-4"
@@ -184,15 +184,15 @@ export default function PlayerStats() {
                       />
                       {playerObj.statistics[0].team.name}
                     </p>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs font-semibold text-fuchsia-900">
                       {`Total Involvements: ${goals + assists}`}
                     </div>
                   </div>
                 </div>
 
                 {/* Pie Chart */}
-                <div className="w-full h-40">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div className="flex items-center justify-center gap-4 w-full md:w-1/3">
+                  <ResponsiveContainer width={100} height={100}>
                     <PieChart>
                       <Pie
                         data={data}
@@ -200,27 +200,40 @@ export default function PlayerStats() {
                         nameKey="name"
                         cx="50%"
                         cy="50%"
-                        // innerRadius={40}
-                        outerRadius={60}
-                        // paddingAngle={2}
-                        label={({ name, percent }) =>
-                          `${name} ${(percent * 100).toFixed(0)}%`
-                        }
+                        outerRadius={40}
+                        labelLine={false}
                       >
                         {data.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip />
-                      <Legend
-                        layout="horizontal"
-                        verticalAlign="bottom"
-                        // align="center"
-                        iconType="circle"
-                        // wrapperStyle={{ fontSize: "12px" }}
-                      />
                     </PieChart>
                   </ResponsiveContainer>
+                  {/* Custom Legend */}
+                  <div className="text-xs space-y-1">
+                    <div className="flex items-center gap-1">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          backgroundColor: PREMIER_LEAGUE_COLORS.accent2,
+                        }}
+                      ></div>
+                      <span className="text-fuchsia-900 font-semibold">
+                        Goals
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          backgroundColor: PREMIER_LEAGUE_COLORS.accent1,
+                        }}
+                      ></div>
+                      <span className="text-fuchsia-900 font-semibold">
+                        Assists
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
