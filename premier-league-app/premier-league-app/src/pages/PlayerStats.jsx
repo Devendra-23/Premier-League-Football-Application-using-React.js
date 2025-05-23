@@ -26,6 +26,7 @@ export default function PlayerStats() {
   const [topAssists, setTopAssists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(null);
 
   const getGoalInvolvements = () => {
     // Create a map to combine data from both lists
@@ -201,12 +202,37 @@ export default function PlayerStats() {
                         cx="50%"
                         cy="50%"
                         outerRadius={40}
+                        activeIndex={activeIndex}
+                        activeOuterRadius={50} // Makes it enlarge on hover
+                        onMouseEnter={(_, index) => setActiveIndex(index)}
+                        onMouseLeave={() => setActiveIndex(null)}
                         labelLine={false}
                       >
                         {data.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
+                      <Pie
+                        data={data}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={50}
+                        activeIndex={activeIndex}
+                        activeOuterRadius={50}
+                        onMouseEnter={(_, index) => setActiveIndex(index)}
+                        onMouseLeave={() => setActiveIndex(null)}
+                        labelLine={false}
+                      >
+                        {data.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value, name) => [`${value}`, name]}
+                        contentStyle={{ fontSize: "12px", borderRadius: "8px" }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                   {/* Custom Legend */}
@@ -219,7 +245,7 @@ export default function PlayerStats() {
                         }}
                       ></div>
                       <span className="text-fuchsia-900 font-semibold">
-                        Goals
+                        Goals: {((goals / (goals + assists)) * 100).toFixed(0)}%
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -230,7 +256,8 @@ export default function PlayerStats() {
                         }}
                       ></div>
                       <span className="text-fuchsia-900 font-semibold">
-                        Assists
+                        Assists:
+                        {((assists / (goals + assists)) * 100).toFixed(0)}%
                       </span>
                     </div>
                   </div>
