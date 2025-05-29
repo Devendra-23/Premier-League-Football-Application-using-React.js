@@ -2,7 +2,7 @@ import json
 import os
 import pandas as pd
 
-def load_standings_data(data_dir="ml/data", start_year=2015, end_year=2024):
+def load_standings_data(data_dir="data", start_year=2015, end_year=2024):
     records = []
     for season in range(start_year, end_year + 1):
         with open(f"{data_dir}/standings_{season}.json", "r") as f:
@@ -20,11 +20,18 @@ def load_standings_data(data_dir="ml/data", start_year=2015, end_year=2024):
                     "losses": team["all"]["lose"]
                 })
     df = pd.DataFrame(records)
+
+    # ✅ Add goal difference column
+    df['goal_diff'] = df['goals_for'] - df['goals_against']
+
     return df
 
 if __name__ == "__main__":
     df = load_standings_data()
     print(df.head())
-    # Ensure the 'processed' folder exists
-    os.makedirs("ml/processed", exist_ok=True)
-    df.to_csv("ml/processed/league_table.csv", index=False)
+
+    # ✅ Ensure the 'processed' folder exists
+    os.makedirs("processed", exist_ok=True)
+
+    # ✅ Save updated CSV
+    df.to_csv("processed/league_table.csv", index=False)
