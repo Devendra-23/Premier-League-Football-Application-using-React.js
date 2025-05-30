@@ -1,0 +1,7 @@
+team,points,top_6_prob,top_6_pred
+Liverpool,84,1.0,1
+Manchester City,71,1.0,1
+Chelsea,69,1.0,1
+Arsenal,74,1.0,1
+Newcastle,66,0.96,1
+Aston Villa,66,0.89,1
