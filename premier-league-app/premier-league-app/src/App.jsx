@@ -1,3 +1,4 @@
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -9,9 +10,10 @@ import PlayerStats from "./pages/PlayerStats";
 export default function App() {
   return (
     <Router>
-      <div className="font-poppins bg-gray-50 min-h-screen">
+      {/* Added Premier League themed background */}
+      <div className="font-poppins bg-gradient-to-b from-fuchsia-950/20 to-slate-900 min-h-screen">
         <Navbar />
-        <main className="pt-16 min-h-[calc(100vh-4rem)] chrome-fix">
+        <main className="pt-16 min-h-[calc(100vh-4rem)]">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/predictions" element={<Predictions />} />
