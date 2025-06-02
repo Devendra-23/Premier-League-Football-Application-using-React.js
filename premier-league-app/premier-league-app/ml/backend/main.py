@@ -16,6 +16,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Access Fly secrets
+API_KEY = os.getenv("VITE_API_KEY")
+API_HOST = os.getenv("VITE_API_HOST")
+
 # Get base directory paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, '..', 'processed', 'top6_model.pkl')
@@ -59,6 +63,10 @@ def root():
         "endpoints": {
             "/predict": "POST with team stats to get predictions",
             "/top6-predictions": "GET precomputed top 6 predictions"
+        },
+        "env": {
+            "API_KEY_FOUND": API_KEY is not None,
+            "API_HOST_FOUND": API_HOST is not None
         }
     }
 
@@ -165,3 +173,8 @@ def get_top6_predictions():
         raise HTTPException(status_code=404, detail="Prediction file not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# Required for Fly.io - listen on port 8080
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8080)
