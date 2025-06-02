@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for backend-hidden-dawn-5114 on 2025-06-03T00:46:26+05:30
+# fly.toml app configuration file generated for ml-silent-pine-9829 on 2025-06-03T03:31:07+05:30
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'backend-hidden-dawn-5114'
+app = 'ml-silent-pine-9829'
 primary_region = 'bom'
 
 [build]

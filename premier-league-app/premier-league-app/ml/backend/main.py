@@ -6,6 +6,7 @@ import joblib
 import pandas as pd
 import os
 import numpy as np
+import shutil
 
 app = FastAPI()
 app.add_middleware(
@@ -20,13 +21,34 @@ app.add_middleware(
 API_KEY = os.getenv("VITE_API_KEY")
 API_HOST = os.getenv("VITE_API_HOST")
 
-# Get base directory paths
+# Base directory
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, '..', 'processed', 'top6_model.pkl')
-LEAGUE_TABLE_PATH = os.path.join(BASE_DIR, '..', 'processed', 'league_table.csv')
-PREDICTIONS_PATH = os.path.join(BASE_DIR, '..', 'processed', 'predicted_top6_2025.csv')
 
-# Load historical data at startup
+# Paths from processed directory
+PROCESSED_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'processed'))
+ORIGINAL_MODEL_PATH = os.path.join(PROCESSED_DIR, 'top6_model.pkl')
+ORIGINAL_LEAGUE_TABLE_PATH = os.path.join(PROCESSED_DIR, 'league_table.csv')
+ORIGINAL_PREDICTIONS_PATH = os.path.join(PROCESSED_DIR, 'predicted_top6_2025.csv')
+
+# Local copies (in backend folder)
+MODEL_PATH = os.path.join(BASE_DIR, 'top6_model.pkl')
+LEAGUE_TABLE_PATH = os.path.join(BASE_DIR, 'league_table.csv')
+PREDICTIONS_PATH = os.path.join(BASE_DIR, 'predicted_top6_2025.csv')
+
+# Copy files if not already present
+def copy_file(src, dst):
+    if not os.path.exists(dst):
+        try:
+            shutil.copy(src, dst)
+            print(f"Copied {src} to {dst}")
+        except Exception as e:
+            print(f"Failed to copy {src}: {e}")
+
+copy_file(ORIGINAL_MODEL_PATH, MODEL_PATH)
+copy_file(ORIGINAL_LEAGUE_TABLE_PATH, LEAGUE_TABLE_PATH)
+copy_file(ORIGINAL_PREDICTIONS_PATH, PREDICTIONS_PATH)
+
+# Load historical data
 historical_df = None
 try:
     historical_df = pd.read_csv(LEAGUE_TABLE_PATH)
@@ -36,7 +58,7 @@ except Exception as e:
     print(f"Failed to load historical data: {e}")
     historical_df = pd.DataFrame()
 
-# Load model at startup
+# Load model
 model = None
 try:
     model = joblib.load(MODEL_PATH)
@@ -54,7 +76,7 @@ class TeamStats(BaseModel):
     wins: int
     draws: int
     losses: int
-    season: Optional[int] = 2024  # Default to current season
+    season: Optional[int] = 2024
 
 @app.get("/")
 def root():
@@ -74,31 +96,26 @@ def root():
 async def predict_top6(teams: List[TeamStats]):
     if model is None:
         raise HTTPException(status_code=500, detail="Model not loaded")
-    
+
     if historical_df.empty:
         raise HTTPException(status_code=500, detail="Historical data not available")
-    
+
     try:
-        # Convert input to DataFrame
         input_data = [team.dict() for team in teams]
         df = pd.DataFrame(input_data)
-        
-        # Prepare features for prediction
+
         features_list = []
         for _, row in df.iterrows():
             team = row['team']
             season = row.get('season', 2024)
-            
-            # Get historical data for the team
+
             team_history = historical_df[
-                (historical_df['team'] == team) & 
+                (historical_df['team'] == team) &
                 (historical_df['season'] < season)
             ]
-            
-            # Calculate years in league
+
             years_in_league = team_history['season'].nunique()
-            
-            # Calculate points change from previous season
+
             points_change = 0.0
             if len(team_history) > 0:
                 prev_season = team_history[team_history['season'] == (season - 1)]
@@ -106,8 +123,7 @@ async def predict_top6(teams: List[TeamStats]):
                     prev_points = prev_season['points'].values[0]
                     current_points = row['points']
                     points_change = (current_points - prev_points) / prev_points if prev_points != 0 else 0.0
-            
-            # Create feature dictionary
+
             features = {
                 'points_prev': row['points'],
                 'goal_diff_prev': row['goal_diff'],
@@ -120,22 +136,17 @@ async def predict_top6(teams: List[TeamStats]):
                 'years_in_league': years_in_league
             }
             features_list.append(features)
-        
-        # Create prediction DataFrame
+
         feature_df = pd.DataFrame(features_list)
-        
-        # Ensure correct feature order
         expected_features = [
             'points_prev', 'goal_diff_prev', 'goals_for_prev', 'goals_against_prev',
             'wins_prev', 'draws_prev', 'losses_prev', 'points_change', 'years_in_league'
         ]
         feature_df = feature_df[expected_features]
-        
-        # Make predictions
+
         probabilities = model.predict_proba(feature_df)[:, 1]
         predictions = (probabilities >= 0.5).astype(int)
-        
-        # Format results
+
         results = []
         for i, team_data in enumerate(input_data):
             results.append({
@@ -144,9 +155,9 @@ async def predict_top6(teams: List[TeamStats]):
                 "top6_prediction": int(predictions[i]),
                 "features": feature_df.iloc[i].to_dict()
             })
-        
+
         return results
-        
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -155,26 +166,23 @@ def get_top6_predictions():
     try:
         if not os.path.exists(PREDICTIONS_PATH):
             raise FileNotFoundError("Prediction file not found")
-            
+
         df = pd.read_csv(PREDICTIONS_PATH)
-        
-        # Rename columns for consistency
+
         df = df.rename(columns={
             'top_6_prob_2025': 'probability',
             'points': 'current_points',
             'goal_diff': 'current_goal_diff'
         })
-        
-        # Select and sort top 6 teams
+
         top6_df = df.sort_values('probability', ascending=False).head(6)
         return top6_df.to_dict(orient='records')
-        
+
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Prediction file not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Required for Fly.io - listen on port 8080
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8080)
