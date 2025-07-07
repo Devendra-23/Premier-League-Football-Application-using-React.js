@@ -1,4 +1,4 @@
-# Premier League Predictor: Full-Stack Application using ML:
+# Premier League Predictor Full-Stack Application using ML:
 Premier League Predictor is an ML-powered full-stack web application that forecasts the Top 6 teams for the upcoming Premier League season using a machine learning model trained on 10 seasons of historical data. The frontend is built with React and Tailwind CSS, while the backend leverages FastAPI and a Random Forest classifier. Engineered custom features and visualized results using Recharts. The project is hosted via Vercel (frontend) and Fly.io (backend).
 
 # 🔗 **Live Demo**: [https://devvspremierleague.vercel.app/](https://devvspremierleague.vercel.app/)
