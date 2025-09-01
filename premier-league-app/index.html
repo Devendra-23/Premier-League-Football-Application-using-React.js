@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Unified viewport meta tag -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover"
+    />
+    <!-- Font preloading for better performance -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      as="style"
+    />
+    <!-- Favicon with proper path -->
+    <link rel="icon" type="image/png" href="/Premier_League_Logo.png" />
+    <!-- Title with season info -->
+    <title>Premier League 2024/25 | Dev's PL</title>
+    <!-- Inline critical CSS -->
+    <style>
+      /* Prevent FOUC */
+      body {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .loaded {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <!-- Font loading handler -->
+    <script>
+      document.fonts.ready.then(() => {
+        document.body.classList.add("loaded");
+      });
+    </script>
+  </body>
+</html>

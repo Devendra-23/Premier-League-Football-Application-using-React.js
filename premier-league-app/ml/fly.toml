@@ -1,0 +1,22 @@
+# fly.toml app configuration file generated for ml-silent-pine-9829 on 2025-06-03T03:31:07+05:30
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'ml-silent-pine-9829'
+primary_region = 'bom'
+
+[build]
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
