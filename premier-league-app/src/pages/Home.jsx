@@ -86,15 +86,17 @@ export default function Home() {
               League Table
             </h2>
             <div className="overflow-x-auto scrollbar-chrome">
-              <table className="w-full min-w-[800px]">
+              <table className="w-full table-fixed text-xs sm:text-sm">
                 <thead>
-                  <tr className="text-left text-gray-600 bg-gray-50">
-                    <th className="px-4 py-3 w-16">Pos</th>
-                    <th className="px-4 py-3 min-w-[200px]">Team</th>
-                    <th className="px-4 py-3 w-24 text-center">Played</th>
-                    <th className="px-4 py-3 w-24 text-center">GD</th>
-                    <th className="px-4 py-3 w-48 text-center">Form</th>
-                    <th className="px-4 py-3 w-24 text-center">Points</th>
+                  <tr className="text-gray-600 bg-gray-50">
+                    <th className="px-2 py-2 w-[40px] text-center">Pos</th>
+                    <th className="px-2 py-2 w-[140px] text-left">Team</th>
+                    <th className="px-2 py-2 w-[60px] text-center">Played</th>
+                    <th className="px-2 py-2 w-[60px] text-center">GD</th>
+                    <th className="hidden sm:table-cell px-2 py-2 w-[100px] text-center">
+                      Form
+                    </th>
+                    <th className="px-2 py-2 w-[60px] text-center">Points</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -103,17 +105,17 @@ export default function Home() {
                       key={team.team.id}
                       className="border-b hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <td className="px-4 py-3 font-medium text-gray-700">
+                      <td className="px-2 py-2 font-medium text-gray-700">
                         {team.rank}
                       </td>
-                      <td className="px-4 py-3 flex items-center min-w-[250px]">
+                      <td className="px-2 py-2 flex items-center">
                         <img
                           src={team.team.logo}
                           alt={team.team.name}
                           className="w-10 h-10 mr-3 bg-white p-1 rounded-full shadow-sm"
                           loading="lazy"
                         />
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-gray-900 truncate text-xs sm:text-sm max-w-[80px] sm:max-w-none">
                           {team.team.name}
                         </span>
                       </td>
@@ -192,7 +194,7 @@ export default function Home() {
 
                       {/* Score & Date */}
                       <div className="my-2 sm:my-0 sm:col-span-1 text-center">
-                        <div className="font-bold text-lg bg-gray-100 text-gray-900 px-2 py-1 rounded-full mx-auto max-w-[120px]">
+                        <div className="font-bold text-sm sm:text-lg bg-gray-100 text-gray-900 px-2 py-1 rounded-full mx-auto max-w-[80px] sm:max-w-[120px]">
                           {match.goals.home ?? "0"} - {match.goals.away ?? "0"}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
