@@ -89,7 +89,9 @@ export default function Home() {
               <table className="w-full table-fixed text-xs sm:text-sm">
                 <thead>
                   <tr className="text-gray-600 bg-gray-50">
-                    <th className="px-2 py-2 w-[40px] text-center">Pos</th>
+                    <th className="px-2 py-2 w-[40px] sm:w-[50px] lg:w-[70px] text-center">
+                      Pos
+                    </th>
                     <th className="px-2 py-2 w-[140px] text-left">Team</th>
                     <th className="px-2 py-2 w-[60px] text-center">Played</th>
                     <th className="px-2 py-2 w-[60px] text-center">GD</th>
@@ -103,7 +105,7 @@ export default function Home() {
                       key={team.team.id}
                       className="border-b hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <td className="px-2 py-2 font-medium text-gray-700">
+                      <td className="px-2 py-2 font-medium text-gray-700 text-center">
                         {team.rank}
                       </td>
                       <td className="px-2 py-2 flex items-center">
