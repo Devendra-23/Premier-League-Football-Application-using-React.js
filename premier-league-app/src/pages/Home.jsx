@@ -93,9 +93,7 @@ export default function Home() {
                     <th className="px-2 py-2 w-[140px] text-left">Team</th>
                     <th className="px-2 py-2 w-[60px] text-center">Played</th>
                     <th className="px-2 py-2 w-[60px] text-center">GD</th>
-                    <th className="hidden sm:table-cell px-2 py-2 w-[100px] text-center">
-                      Form
-                    </th>
+                    <th className="px-2 py-2 w-[100px] text-center">Form</th>
                     <th className="px-2 py-2 w-[60px] text-center">Points</th>
                   </tr>
                 </thead>
