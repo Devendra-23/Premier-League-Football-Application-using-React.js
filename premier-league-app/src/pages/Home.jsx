@@ -176,22 +176,22 @@ export default function Home() {
                     className="group p-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 border-b last:border-0"
                   >
                     {/* Changed to grid layout */}
-                    <div className="grid grid-cols-5 items-center gap-4">
+                    <div className="flex flex-col items-center text-center sm:grid sm:grid-cols-5 sm:items-center sm:gap-4">
                       {/* Home Team */}
-                      <div className="col-span-2 flex items-center">
+                      <div className="flex items-center justify-center sm:justify-start sm:col-span-2 w-full">
                         <img
                           src={match.teams.home.logo}
-                          className="w-10 h-10 mr-3 bg-white p-1 rounded-full shadow-sm flex-shrink-0"
+                          className="w-8 h-8 sm:w-10 sm:h-10 mr-2 bg-white p-1 rounded-full shadow-sm flex-shrink-0"
                           alt={match.teams.home.name}
                           loading="lazy"
                         />
-                        <span className="font-medium text-gray-800 truncate text-sm">
+                        <span className="font-medium text-gray-800 truncate text-sm sm:text-base max-w-[100px] sm:max-w-none">
                           {match.teams.home.name}
                         </span>
                       </div>
 
                       {/* Score & Date */}
-                      <div className="col-span-1 text-center">
+                      <div className="my-2 sm:my-0 sm:col-span-1 text-center">
                         <div className="font-bold text-lg bg-gray-100 text-gray-900 px-2 py-1 rounded-full mx-auto max-w-[120px]">
                           {match.goals.home ?? "0"} - {match.goals.away ?? "0"}
                         </div>
@@ -208,13 +208,13 @@ export default function Home() {
                       </div>
 
                       {/* Away Team */}
-                      <div className="col-span-2 flex items-center justify-end">
-                        <span className="font-medium text-gray-800 truncate text-sm mr-3">
+                      <div className="flex items-center justify-center sm:justify-end sm:col-span-2 w-full">
+                        <span className="font-medium text-gray-800 truncate text-sm sm:text-base max-w-[100px] sm:max-w-none mr-2 sm:mr-3">
                           {match.teams.away.name}
                         </span>
                         <img
                           src={match.teams.away.logo}
-                          className="w-10 h-10 bg-white p-1 rounded-full shadow-sm flex-shrink-0"
+                          className="w-8 h-8 sm:w-10 sm:h-10 bg-white p-1 rounded-full shadow-sm flex-shrink-0"
                           alt={match.teams.away.name}
                           loading="lazy"
                         />
